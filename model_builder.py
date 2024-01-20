@@ -8,6 +8,7 @@ from tensorflow.keras.preprocessing.sequence import pad_sequences
 from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import Embedding, Flatten, Dense, Dropout
 from tensorflow.keras.utils import to_categorical
+import pickle
 
 # Load your dataset
 training_path = '2018-Valence-oc-En-train.csv'
@@ -15,7 +16,7 @@ train_df = pd.read_csv(training_path)
 
 nltk.download('wordnet')
 
-# Preprocessing function (similar to before)
+# Preprocessing function 
 def preprocess_tweet(tweet):
     tokens = tweet.split()
     lemmatizer = nltk.stem.WordNetLemmatizer()
@@ -32,6 +33,9 @@ sequences = tokenizer.texts_to_sequences(train_df['Tweet'])
 
 # Pad the sequences
 max_length = max(len(x) for x in sequences)
+with open('maxlen.pkl', 'wb') as maxlen_file:
+    pickle.dump(max_length, maxlen_file)
+
 X = pad_sequences(sequences, maxlen=max_length)
 
 # Encode the labels to categorical (one-hot encoding)
@@ -62,3 +66,9 @@ print(f'Validation accuracy: {accuracy:.2f}')
 
 model.save('tweet_mental_state_model.h5')
 model.save('tweet_mental_state_model.keras')
+
+with open('tokenizer.pkl', 'wb') as tokenizer_file:
+    pickle.dump(tokenizer, tokenizer_file)
+
+with open('label_encoder.pkl', 'wb') as label_encoder_file:
+    pickle.dump(label_encoder, label_encoder_file)
